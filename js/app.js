@@ -8,110 +8,33 @@ const headers = {
     'Content-Type': 'application/json',
 };
 
-// Inicializa o scanner do Html5Qrcode
 const html5QrcodeScanner = new Html5Qrcode("reader");
 
-// Função para iniciar o scanner
 function startScanning() {
-        // First, request camera permission
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(function(stream) {
-                // Permission granted, start the scanner
-                html5QrcodeScanner.start(
-                    { facingMode: "environment" },
-                    {
-                        fps: 10,
-                        qrbox: { width: 250, height: 250 }
-                    },
-                    onScanSuccess,
-                    onScanError
-                );
-            })
-            .catch(function(err) {
-                console.error("Camera permission denied:", err);
-                alert("Por favor, permita o acesso à câmera para usar o scanner.");
-            });
-    }
-
-    function stopScanning() {
-        html5QrcodeScanner.stop().then(() => {
-            console.log('Scanner parado');
-        }).catch((err) => {
-            console.error('Erro ao parar scanner:', err);
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(() => {
+            html5QrcodeScanner.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                onScanSuccess,
+                onScanError
+            );
+        })
+        .catch((err) => {
+            console.error("Erro ao acessar a câmera:", err);
+            alert("Por favor, permita o acesso à câmera para usar o scanner.");
         });
-    }
-
-    function onScanSuccess(decodedText, decodedResult) {
-        const resultContainer = document.getElementById('result');
-        const resultText = document.getElementById('result-text');
-        
-        resultContainer.style.display = 'block';
-        resultText.textContent = decodedText;
-        resultContainer.classList.add('success-animation');
-        
-        validateScannedCode(decodedText);
-        
-        document.getElementById('patrimonio').value = decodedText;
-        
-        addToHistory(decodedText);
-        
-        setTimeout(() => {
-            resultContainer.classList.remove('success-animation');
-        }, 1000);
-
-        if (navigator.vibrate) {
-            navigator.vibrate(200);
-        }
-    }
-
-    function onScanError(error) {
-        console.warn(`Erro de código: ${error}`);
-    }
-
-    function addToHistory(scannedText) {
-        const historyList = document.getElementById('history-list');
-        const now = new Date();
-        const timeString = now.toLocaleTimeString();
-        
-        const historyItem = document.createElement('div');
-        historyItem.className = 'history-item';
-        historyItem.innerHTML = `
-            <span>${scannedText}</span>
-            <span class="time-stamp">${timeString}</span>
-        `;
-        
-        historyList.insertBefore(historyItem, historyList.firstChild);
-    }
-
-
-    // Consulta o produto no Airtable
-    const product = await fetchProductFromAirtable(decodedText);
-
-    if (product) {
-        resultContainer.classList.remove('result-error');
-        resultContainer.classList.add('result-success');
-        validationMessage.innerHTML = `
-            ✅ Produto encontrado!<br>
-            <strong>Patrimônio:</strong> ${product.patrimonio}<br>
-            <strong>Setor:</strong> ${product.setor}<br>
-            <strong>Descrição:</strong> ${product.descricao}
-        `;
-    } else {
-        resultContainer.classList.remove('result-success');
-        resultContainer.classList.add('result-error');
-        validationMessage.innerHTML = '❌ Produto não encontrado!';
-    }
-
-    // Adiciona o código ao histórico
-    addToHistory(decodedText);
 }
 
-// Função chamada ao detectar um erro no scanner
-function onScanError(error) {
-    console.warn(`Erro durante a leitura: ${error}`);
+function stopScanning() {
+    html5QrcodeScanner.stop()
+        .then(() => console.log("Scanner parado"))
+        .catch((err) => console.error("Erro ao parar scanner:", err));
 }
 
-// Função para consultar um produto no Airtable
 async function fetchProductFromAirtable(code) {
     const filter = `filterByFormula=SEARCH("${code}", {Patrimônio})`;
 
@@ -126,7 +49,7 @@ async function fetchProductFromAirtable(code) {
                 descricao: product.Descrição,
             };
         } else {
-            return null; // Produto não encontrado
+            return null;
         }
     } catch (error) {
         console.error("Erro ao buscar produto no Airtable:", error);
@@ -134,4 +57,61 @@ async function fetchProductFromAirtable(code) {
     }
 }
 
+function onScanSuccess(decodedText, decodedResult) {
+    console.log(`Código detectado: ${decodedText}`);
+    const resultContainer = document.getElementById('result');
+    const resultText = document.getElementById('result-text');
+    const validationMessage = document.getElementById('validation-message');
+
+    resultContainer.style.display = 'block';
+    resultText.textContent = decodedText;
+
+    fetchProductFromAirtable(decodedText).then((product) => {
+        if (product) {
+            resultContainer.classList.remove('result-error');
+            resultContainer.classList.add('result-success');
+            validationMessage.innerHTML = `
+                ✅ Produto encontrado!<br>
+                <strong>Patrimônio:</strong> ${product.patrimonio}<br>
+                <strong>Setor:</strong> ${product.setor}<br>
+                <strong>Descrição:</strong> ${product.descricao}
+            `;
+        } else {
+            resultContainer.classList.remove('result-success');
+            resultContainer.classList.add('result-error');
+            validationMessage.innerHTML = '❌ Produto não encontrado!';
+        }
+    });
+
+    addToHistory(decodedText);
+}
+
+function onScanError(error) {
+    console.warn(`Erro durante a leitura: ${error}`);
+}
+
+function addToHistory(scannedText) {
+    const historyList = document.getElementById('history-list');
+    const timeString = new Date().toLocaleTimeString();
+
+    const historyItem = document.createElement('div');
+    historyItem.className = 'history-item';
+    historyItem.innerHTML = `
+        <span>${scannedText}</span>
+        <span class="time-stamp">${timeString}</span>
+    `;
+
+    historyList.insertBefore(historyItem, historyList.firstChild);
+}
+
+document.getElementById('startButton').addEventListener('click', function () {
+    const isScanning = this.textContent === "Parar Scanner";
+
+    if (isScanning) {
+        stopScanning();
+        this.textContent = "Iniciar Scanner";
+    } else {
+        startScanning();
+        this.textContent = "Parar Scanner";
+    }
 });
