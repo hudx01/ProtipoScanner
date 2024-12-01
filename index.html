@@ -1,16 +1,214 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Scanner de Código de Barras</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
+<html><head><base href="https://developer.mozilla.org/">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content: https://ssl.gstatic.com 'unsafe-eval'; media-src * blob: 'self' http://* 'unsafe-inline' 'unsafe-eval';">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Scanner de Código de Barras</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<style>
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 70px; /* Add padding to account for bottom nav */
+}
+
+.tab-content {
+    display: none;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9em;
+    padding: 5px 0;
+}
+
+.nav-item.active {
+    color: #2196F3;
+}
+
+.nav-item i {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.scanner-container, .register-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0;
+    background: white;
+    padding: 20px;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.result-container {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    display: none;
+}
+
+.result-success {
+    background: #e8f5e9;
+}
+
+.result-error {
+    background: #ffebee;
+}
+
+.success-animation {
+    animation: success-pulse 1s ease-in-out;
+}
+
+@keyframes success-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.scan-button, .submit-button {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 10px 0;
+}
+
+.scan-button:hover, .submit-button:hover {
+    background: #1976D2;
+    transform: translateY(-2px);
+}
+
+.history {
+    width: 100%;
+    max-width: 500px;
+    margin-top: 20px;
+}
+
+.history-item {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.time-stamp {
+    color: #666;
+    font-size: 0.8em;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.products-table th, .products-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.products-table th {
+    background-color: #f5f5f5;
+}
+
+.products-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.import-container {
+    margin: 20px 0;
+    padding: 15px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.import-button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.import-button:hover {
+    background: #45a049;
+}
+
+.file-input {
+    display: none;
+}
+
+.csv-info {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+}
+</style>
 </head>
 <body>
-    <!-- Conteúdo principal -->
     <div id="scanner-tab" class="tab-content active">
         <div class="scanner-container">
             <h2>📱 Scanner de Código de Barras</h2>
@@ -22,12 +220,53 @@
                 <p id="validation-message"></p>
             </div>
         </div>
+
         <div class="history">
             <h3>Histórico de Leituras</h3>
             <div id="history-list"></div>
         </div>
     </div>
-    <!-- Outras abas omitidas por brevidade -->
+
+    <div id="products-tab" class="tab-content">
+        <div class="register-container">
+            <h2>📝 Cadastro de Produtos</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="patrimonio">Placa de Patrimônio:</label>
+                    <input type="text" id="patrimonio" required>
+                </div>
+                <div class="form-group">
+                    <label for="setor">Setor:</label>
+                    <input type="text" id="setor" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição:</label>
+                    <input type="text" id="descricao" required>
+                </div>
+                <button type="submit" class="submit-button">Cadastrar Produto</button>
+            </form>
+
+            <div class="import-container">
+                <input type="file" id="csvFileInput" class="file-input" accept=".csv">
+                <button class="import-button" id="importButton">Importar CSV</button>
+                <p class="csv-info">Formato esperado: patrimonio,setor,descricao</p>
+            </div>
+
+            <h3>Produtos Cadastrados</h3>
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Patrimônio</th>
+                        <th>Setor</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
         <a href="#scanner" class="nav-item active" data-tab="scanner-tab">
             <i class="fas fa-qrcode"></i>
@@ -39,10 +278,209 @@
         </a>
     </nav>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="js/html5-qrcode.min.js"></script>
-    <script src="js/papaparse.min.js"></script>
-    <script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const html5QrcodeScanner = new Html5Qrcode("reader");
+    let scanning = false;
+    let products = [];
+
+    // Import CSV functionality
+    document.getElementById('importButton').addEventListener('click', function() {
+        document.getElementById('csvFileInput').click();
+    });
+
+    document.getElementById('csvFileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            Papa.parse(file, {
+                complete: function(results) {
+                    if (results.data && results.data.length > 0) {
+                        const startIndex = results.data[0][0].toLowerCase() === 'patrimonio' ? 1 : 0;
+                        
+                        for (let i = startIndex; i < results.data.length; i++) {
+                            const row = results.data[i];
+                            if (row.length >= 3 && row[0]) {
+                                products.push({
+                                    patrimonio: row[0],
+                                    setor: row[1],
+                                    descricao: row[2]
+                                });
+                            }
+                        }
+                        updateProductsTable();
+                        alert('Produtos importados com sucesso!');
+                    }
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                    alert('Erro ao importar arquivo CSV');
+                }
+            });
+        }
+    });
+
+    document.getElementById('startButton').addEventListener('click', function() {
+        if (!scanning) {
+            startScanning();
+            this.textContent = "Parar Scanner";
+        } else {
+            stopScanning();
+            this.textContent = "Iniciar Scanner";
+        }
+        scanning = !scanning;
+    });
+
+    document.getElementById('productForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const product = {
+            patrimonio: document.getElementById('patrimonio').value,
+            setor: document.getElementById('setor').value,
+            descricao: document.getElementById('descricao').value
+        };
+
+        products.push(product);
+        updateProductsTable();
+        
+        this.reset();
+    });
+
+    function updateProductsTable() {
+        const tableBody = document.getElementById('productsTableBody');
+        tableBody.innerHTML = '';
+        
+        products.forEach(product => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${product.patrimonio}</td>
+                <td>${product.setor}</td>
+                <td>${product.descricao}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function validateScannedCode(scannedCode) {
+        const product = products.find(p => p.patrimonio === scannedCode);
+        const resultContainer = document.getElementById('result');
+        const validationMessage = document.getElementById('validation-message');
+
+        if (product) {
+            resultContainer.classList.remove('result-error');
+            resultContainer.classList.add('result-success');
+            validationMessage.innerHTML = `
+                ✅ Produto cadastrado!<br>
+                Setor: ${product.setor}<br>
+                Descrição: ${product.descricao}
+            `;
+            return true;
+        } else {
+            resultContainer.classList.remove('result-success');
+            resultContainer.classList.add('result-error');
+            validationMessage.innerHTML = '❌ Produto não cadastrado!';
+            return false;
+        }
+    }
+
+    function startScanning() {
+        // First, request camera permission
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(function(stream) {
+                // Permission granted, start the scanner
+                html5QrcodeScanner.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    onScanSuccess,
+                    onScanError
+                );
+            })
+            .catch(function(err) {
+                console.error("Camera permission denied:", err);
+                alert("Por favor, permita o acesso à câmera para usar o scanner.");
+            });
+    }
+
+    function stopScanning() {
+        html5QrcodeScanner.stop().then(() => {
+            console.log('Scanner parado');
+        }).catch((err) => {
+            console.error('Erro ao parar scanner:', err);
+        });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+        const resultContainer = document.getElementById('result');
+        const resultText = document.getElementById('result-text');
+        
+        resultContainer.style.display = 'block';
+        resultText.textContent = decodedText;
+        resultContainer.classList.add('success-animation');
+        
+        validateScannedCode(decodedText);
+        
+        document.getElementById('patrimonio').value = decodedText;
+        
+        addToHistory(decodedText);
+        
+        setTimeout(() => {
+            resultContainer.classList.remove('success-animation');
+        }, 1000);
+
+        if (navigator.vibrate) {
+            navigator.vibrate(200);
+        }
+    }
+
+    function onScanError(error) {
+        console.warn(`Erro de código: ${error}`);
+    }
+
+    function addToHistory(scannedText) {
+        const historyList = document.getElementById('history-list');
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+            <span>${scannedText}</span>
+            <span class="time-stamp">${timeString}</span>
+        `;
+        
+        historyList.insertBefore(historyItem, historyList.firstChild);
+    }
+
+    // Tab switching functionality
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all tabs and nav items
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            navItems.forEach(navItem => {
+                navItem.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab and nav item
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+            this.classList.add('active');
+            
+            // Stop scanner when switching away from scanner tab
+            if (tabId !== 'scanner-tab' && scanning) {
+                stopScanning();
+                document.getElementById('startButton').textContent = "Iniciar Scanner";
+                scanning = false;
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
