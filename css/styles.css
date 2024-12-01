@@ -7,7 +7,52 @@ body {
     flex-direction: column;
     align-items: center;
 }
-.tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 20px; }
-.tab-content.active { display: block; }
-.nav-item.active { color: #2196F3; }
-.scan-button:hover, .submit-button:hover { background: #1976D2; transform: translateY(-2px); }
+
+.tab-content {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.result-container {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    display: none;
+}
+
+.result-success {
+    background: #e8f5e9;
+}
+
+.result-error {
+    background: #ffebee;
+}
+
+.scan-button {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 10px 0;
+}
+
+.scan-button:hover {
+    background: #1976D2;
+    transform: translateY(-2px);
+}
+
+.history-item {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
