@@ -36,19 +36,23 @@ function stopScanning() {
 }
 
 async function fetchProductFromAirtable(code) {
-    const filter = `filterByFormula=SEARCH("${code}", {Patrimônio})`;
+    const filter = `filterByFormula=SEARCH("${code}", {Patrimônio})`; // Busca pelo código de barras no campo 'Patrimônio'
+    console.log("Consultando Airtable com o código:", code); // Log para depuração
 
     try {
         const response = await axios.get(`${AIRTABLE_URL}?${filter}`, { headers });
 
+        // Verifica se a consulta retornou algum produto
         if (response.data.records.length > 0) {
             const product = response.data.records[0].fields;
+            console.log("Produto encontrado:", product); // Log para depuração
             return {
                 patrimonio: product.Patrimônio,
                 setor: product.Setor,
                 descricao: product.Descrição,
             };
         } else {
+            console.log("Produto não encontrado no Airtable."); // Log para depuração
             return null;
         }
     } catch (error) {
@@ -56,7 +60,6 @@ async function fetchProductFromAirtable(code) {
         return null;
     }
 }
-
 function onScanSuccess(decodedText, decodedResult) {
     console.log(`Código detectado: ${decodedText}`);
     const resultContainer = document.getElementById('result');
