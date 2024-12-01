@@ -13,41 +13,76 @@ const html5QrcodeScanner = new Html5Qrcode("reader");
 
 // Função para iniciar o scanner
 function startScanning() {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(() => {
-            html5QrcodeScanner.start(
-                { facingMode: "environment" }, // Usa a câmera traseira
-                {
-                    fps: 10,                   // Taxa de quadros por segundo
-                    qrbox: { width: 250, height: 250 }, // Área de detecção
-                },
-                onScanSuccess,                // Função chamada ao detectar código
-                onScanError                   // Função chamada ao detectar erro
-            );
-        })
-        .catch((err) => {
-            console.error("Erro ao acessar a câmera:", err);
-            alert("Por favor, permita o acesso à câmera para usar o scanner.");
+        // First, request camera permission
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(function(stream) {
+                // Permission granted, start the scanner
+                html5QrcodeScanner.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    onScanSuccess,
+                    onScanError
+                );
+            })
+            .catch(function(err) {
+                console.error("Camera permission denied:", err);
+                alert("Por favor, permita o acesso à câmera para usar o scanner.");
+            });
+    }
+
+    function stopScanning() {
+        html5QrcodeScanner.stop().then(() => {
+            console.log('Scanner parado');
+        }).catch((err) => {
+            console.error('Erro ao parar scanner:', err);
         });
-}
+    }
 
-// Função para parar o scanner
-function stopScanning() {
-    html5QrcodeScanner.stop()
-        .then(() => console.log("Scanner parado"))
-        .catch((err) => console.error("Erro ao parar o scanner:", err));
-}
+    function onScanSuccess(decodedText, decodedResult) {
+        const resultContainer = document.getElementById('result');
+        const resultText = document.getElementById('result-text');
+        
+        resultContainer.style.display = 'block';
+        resultText.textContent = decodedText;
+        resultContainer.classList.add('success-animation');
+        
+        validateScannedCode(decodedText);
+        
+        document.getElementById('patrimonio').value = decodedText;
+        
+        addToHistory(decodedText);
+        
+        setTimeout(() => {
+            resultContainer.classList.remove('success-animation');
+        }, 1000);
 
-// Função chamada ao detectar um código com sucesso
-async function onScanSuccess(decodedText) {
-    console.log(`Código detectado: ${decodedText}`);
+        if (navigator.vibrate) {
+            navigator.vibrate(200);
+        }
+    }
 
-    const resultContainer = document.getElementById('result');
-    const resultText = document.getElementById('result-text');
-    const validationMessage = document.getElementById('validation-message');
+    function onScanError(error) {
+        console.warn(`Erro de código: ${error}`);
+    }
 
-    resultContainer.style.display = 'block';
-    resultText.textContent = decodedText;
+    function addToHistory(scannedText) {
+        const historyList = document.getElementById('history-list');
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+            <span>${scannedText}</span>
+            <span class="time-stamp">${timeString}</span>
+        `;
+        
+        historyList.insertBefore(historyItem, historyList.firstChild);
+    }
+
 
     // Consulta o produto no Airtable
     const product = await fetchProductFromAirtable(decodedText);
@@ -99,30 +134,4 @@ async function fetchProductFromAirtable(code) {
     }
 }
 
-// Função para adicionar um código ao histórico de leituras
-function addToHistory(scannedText) {
-    const historyList = document.getElementById('history-list');
-    const timeString = new Date().toLocaleTimeString();
-
-    const historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
-    historyItem.innerHTML = `
-        <span>${scannedText}</span>
-        <span class="time-stamp">${timeString}</span>
-    `;
-
-    historyList.insertBefore(historyItem, historyList.firstChild);
-}
-
-// Configuração do botão para iniciar/parar o scanner
-document.getElementById('startButton').addEventListener('click', function () {
-    const isScanning = this.textContent === "Parar Scanner";
-
-    if (isScanning) {
-        stopScanning();
-        this.textContent = "Iniciar Scanner";
-    } else {
-        startScanning();
-        this.textContent = "Parar Scanner";
-    }
 });
