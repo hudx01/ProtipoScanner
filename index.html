@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content: https://ssl.gstatic.com 'unsafe-eval'; media-src * blob: 'self' http://* 'unsafe-inline' 'unsafe-eval';">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Scanner de Código de Barras</title>
-    <!-- Estilos -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -20,19 +22,67 @@
                 <p id="validation-message"></p>
             </div>
         </div>
-
         <div class="history">
             <h3>Histórico de Leituras</h3>
             <div id="history-list"></div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <!-- Biblioteca para leitura de QR codes -->
-    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
-    <!-- Biblioteca para requisições HTTP -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- Código do aplicativo -->
+    <div id="products-tab" class="tab-content">
+        <div class="register-container">
+            <h2>📝 Cadastro de Produtos</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="patrimonio">Placa de Patrimônio:</label>
+                    <input type="text" id="patrimonio" required>
+                </div>
+                <div class="form-group">
+                    <label for="setor">Setor:</label>
+                    <input type="text" id="setor" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição:</label>
+                    <input type="text" id="descricao" required>
+                </div>
+                <button type="submit" class="submit-button">Cadastrar Produto</button>
+            </form>
+
+            <div class="import-container">
+                <input type="file" id="csvFileInput" class="file-input" accept=".csv">
+                <button class="import-button" id="importButton">Importar CSV</button>
+                <p class="csv-info">Formato esperado: patrimonio,setor,descricao</p>
+            </div>
+
+            <h3>Produtos Cadastrados</h3>
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Patrimônio</th>
+                        <th>Setor</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#scanner" class="nav-item active" data-tab="scanner-tab">
+            <i class="fas fa-qrcode"></i>
+            <span>Scanner</span>
+        </a>
+        <a href="#products" class="nav-item" data-tab="products-tab">
+            <i class="fas fa-box"></i>
+            <span>Produtos</span>
+        </a>
+    </nav>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="js/axios.min.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
