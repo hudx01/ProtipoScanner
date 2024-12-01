@@ -28,46 +28,6 @@
         </div>
     </div>
 
-    <div id="products-tab" class="tab-content">
-        <div class="register-container">
-            <h2>📝 Cadastro de Produtos</h2>
-            <form id="productForm">
-                <div class="form-group">
-                    <label for="patrimonio">Placa de Patrimônio:</label>
-                    <input type="text" id="patrimonio" required>
-                </div>
-                <div class="form-group">
-                    <label for="setor">Setor:</label>
-                    <input type="text" id="setor" required>
-                </div>
-                <div class="form-group">
-                    <label for="descricao">Descrição:</label>
-                    <input type="text" id="descricao" required>
-                </div>
-                <button type="submit" class="submit-button">Cadastrar Produto</button>
-            </form>
-
-            <div class="import-container">
-                <input type="file" id="csvFileInput" class="file-input" accept=".csv">
-                <button class="import-button" id="importButton">Importar CSV</button>
-                <p class="csv-info">Formato esperado: patrimonio,setor,descricao</p>
-            </div>
-
-            <h3>Produtos Cadastrados</h3>
-            <table class="products-table">
-                <thead>
-                    <tr>
-                        <th>Patrimônio</th>
-                        <th>Setor</th>
-                        <th>Descrição</th>
-                    </tr>
-                </thead>
-                <tbody id="productsTableBody">
-                </tbody>
-            </table>
-        </div>
-    </div>
-
     <nav class="bottom-nav">
         <a href="#scanner" class="nav-item active" data-tab="scanner-tab">
             <i class="fas fa-qrcode"></i>
