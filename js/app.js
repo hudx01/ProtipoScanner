@@ -1,5 +1,5 @@
 const AIRTABLE_API_KEY = 'patG7MV5FXpkeFWqS.1fd2aea9e52ee4537eb78f5cc668a4785bd6d2d5118f2a40a8a03d522f72790c'; // Substitua pela sua API Key
-const BASE_ID = 'inventario';         // Substitua pelo ID da sua base
+const BASE_ID = 'appkIkoO2SW02yNIW';         // Substitua pelo ID da sua base
 const TABLE_NAME = 'Table1';         // Nome da tabela no Airtable
 const AIRTABLE_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
 
