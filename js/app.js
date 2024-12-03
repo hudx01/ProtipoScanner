@@ -69,7 +69,10 @@ function onScanSuccess(decodedText, decodedResult) {
     resultContainer.style.display = 'block';
     resultText.textContent = decodedText;
     
-    navigator.vibrate(200);
+    // Realiza três vibrações
+    if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200, 100, 200]); // Vibrações: [duração, pausa, duração, pausa, duração]
+    }
     
 
     fetchProductFromAirtable(decodedText).then((product) => {
