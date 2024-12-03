@@ -10,6 +10,13 @@ const headers = {
 
 const html5QrcodeScanner = new Html5Qrcode("reader");
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('Service Worker registrado!'))
+        .catch(err => console.error('Erro ao registrar Service Worker:', err));
+}
+
+
 function startScanning() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
         .then(() => {
