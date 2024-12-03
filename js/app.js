@@ -68,6 +68,9 @@ function onScanSuccess(decodedText, decodedResult) {
 
     resultContainer.style.display = 'block';
     resultText.textContent = decodedText;
+    if (navigator.vibrate) {
+            navigator.vibrate(200);
+    }
 
     fetchProductFromAirtable(decodedText).then((product) => {
         if (product) {
