@@ -78,7 +78,7 @@ function onScanSuccess(decodedText, decodedResult) {
     
     // Realiza três vibrações
     if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200, 100, 200]); // Vibrações: [duração, pausa, duração, pausa, duração]
+        navigator.vibrate([200, 100, 200]); // Vibrações: [duração, pausa, duração, pausa, duração]
     }
     
 
