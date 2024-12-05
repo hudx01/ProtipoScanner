@@ -97,6 +97,7 @@ async function onScanSuccess(decodedText) {
             <strong>Setor:</strong> ${product.setor}<br>
             <strong>Descrição:</strong> ${product.descricao}
         `;
+        displaySector(product.setor)
     } else {
         resultContainer.classList.remove('result-success');
         resultContainer.classList.add('result-error');
