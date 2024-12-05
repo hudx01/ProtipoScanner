@@ -34,7 +34,6 @@ function startScanning() {
                     qrbox: { width: 250, height: 250 }
                 },
                 onScanSuccess,
-                stopScanning,
                 onScanError
             );
         })
