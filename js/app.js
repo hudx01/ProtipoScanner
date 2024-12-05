@@ -61,6 +61,7 @@ async function fetchProductFromAirtable(code) {
             const product = response.data.records[0].fields;
             console.log("Produto encontrado:", product); // Log para depuração
             return {
+                recordId: record.id,
                 patrimonio: product.Patrimônio,
                 setor: product.Setor,
                 descricao: product.Descrição,
@@ -98,7 +99,9 @@ function onScanSuccess(decodedText, decodedResult) {
                 <strong>Patrimônio:</strong> ${product.patrimonio}<br>
                 <strong>Setor:</strong> ${product.setor}<br>
                 <strong>Descrição:</strong> ${product.descricao}
-            `;           
+            `;  
+            // Atualiza o campo 'status' com 'ok' no Airtable
+            await updateStatusInAirtable(product.recordId);
             displaySector(product.setor)
         } else {
             resultContainer.classList.remove('result-success');
@@ -109,6 +112,24 @@ function onScanSuccess(decodedText, decodedResult) {
 
     addToHistory(decodedText);
 }
+
+//Atualiza campos Status com ok 
+async function updateStatusInAirtable(recordId) {
+    const url = `${AIRTABLE_URL}/${recordId}`; // Endpoint para o registro específico
+    const data = {
+        fields: {
+            status: "ok" // Atualiza o campo 'status' com 'ok'
+        }
+    };
+
+    try {
+        const response = await axios.patch(url, data, { headers });
+        console.log("Registro atualizado com sucesso:", response.data);
+    } catch (error) {
+        console.error("Erro ao atualizar o status no Airtable:", error);
+    }
+}
+
 
 function onScanError(error) {
     console.warn(`Erro durante a leitura: ${error}`);
