@@ -61,7 +61,6 @@ async function fetchProductFromAirtable(code) {
             const product = response.data.records[0].fields;
             console.log("Produto encontrado:", product); // Log para depuração
             return {
-                recordId: record.id,
                 patrimonio: product.Patrimônio,
                 setor: product.Setor,
                 descricao: product.Descrição,
