@@ -75,7 +75,7 @@ async function fetchProductFromAirtable(code) {
     }
 }
 
-function onScanSuccess(decodedText, decodedResult) {
+async function onScanSuccess(decodedText, decodedResult) {
     console.log(`Código detectado: ${decodedText}`);
     
     const resultContainer = document.getElementById('result');
