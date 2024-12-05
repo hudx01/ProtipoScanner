@@ -9,7 +9,11 @@ const headers = {
 };
 
 const html5QrcodeScanner = new Html5Qrcode("reader");
-
+ if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('ProtipoScanner/service-worker.js')
+        .then(() => console.log('Service Worker registrado!'))
+        .catch(err => console.error('Erro ao registrar Service Worker:', err));
+}
 
 
 function startScanning() {
@@ -125,11 +129,4 @@ document.getElementById('startButton').addEventListener('click', function () {
         startScanning();
         this.textContent = "Parar Scanner";
     }
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-        .then(() => console.log('Service Worker registrado!'))
-        .catch(err => console.error('Erro ao registrar Service Worker:', err));
-}
-  
 });
