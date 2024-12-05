@@ -99,6 +99,7 @@ function onScanSuccess(decodedText, decodedResult) {
                 <strong>Setor:</strong> ${product.setor}<br>
                 <strong>Descrição:</strong> ${product.descricao}
             `;
+            stopScanning,
             displaySector(product.setor)
         } else {
             resultContainer.classList.remove('result-success');
