@@ -10,6 +10,15 @@ const headers = {
 
 const html5QrcodeScanner = new Html5Qrcode("reader");
 
+function displaySector(sector) {
+    const sectorInfo = document.getElementById('sectorInfo');
+    const sectorName = document.getElementById('sectorName');
+
+    sectorName.textContent = sector;
+    sectorInfo.style.display = 'block';
+}
+
+
  
 function startScanning() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
@@ -86,6 +95,7 @@ function onScanSuccess(decodedText, decodedResult) {
                 <strong>Setor:</strong> ${product.setor}<br>
                 <strong>Descrição:</strong> ${product.descricao}
             `;
+            displaySector(product.setor)
         } else {
             resultContainer.classList.remove('result-success');
             resultContainer.classList.add('result-error');
