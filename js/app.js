@@ -34,6 +34,7 @@ function startScanning() {
                     qrbox: { width: 250, height: 250 }
                 },
                 onScanSuccess,
+                stopScanning,
                 onScanError
             );
         })
@@ -98,8 +99,7 @@ function onScanSuccess(decodedText, decodedResult) {
                 <strong>Patrimônio:</strong> ${product.patrimonio}<br>
                 <strong>Setor:</strong> ${product.setor}<br>
                 <strong>Descrição:</strong> ${product.descricao}
-            `;
-            stopScanning,
+            `;           
             displaySector(product.setor)
         } else {
             resultContainer.classList.remove('result-success');
