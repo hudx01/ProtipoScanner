@@ -22,7 +22,10 @@ function displaySector(sector) {
 
  
 function startScanning() {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    navigator.mediaDevices.getUserMedia({ video: {
+        facingMode: "environment", // Câmera traseira
+        focusMode: "continuous"    // Tenta focar continuamente
+    } })
         .then(() => {
             html5QrcodeScanner.start(
                 { facingMode: "environment" },
