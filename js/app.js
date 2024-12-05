@@ -77,20 +77,23 @@ async function fetchProductFromAirtable(code) {
 }
 async function onScanSuccess(decodedText, decodedResult) {
     console.log(`Código detectado: ${decodedText}`);
+    
     const resultContainer = document.getElementById('result');
     const resultText = document.getElementById('result-text');
     const validationMessage = document.getElementById('validation-message');
 
     resultContainer.style.display = 'block';
     resultText.textContent = decodedText;
-    
+
     // Realiza três vibrações
     if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]); // Vibrações: [duração, pausa, duração, pausa, duração]
+        navigator.vibrate([200, 100, 200]); // Vibrações: [duração, pausa, duração]
     }
-    
 
-    fetchProductFromAirtable(decodedText).then((product) => {
+    try {
+        // Busca o produto no Airtable
+        const product = await fetchProductFromAirtable(decodedText);
+
         if (product) {
             resultContainer.classList.remove('result-error');
             resultContainer.classList.add('result-success');
@@ -99,19 +102,29 @@ async function onScanSuccess(decodedText, decodedResult) {
                 <strong>Patrimônio:</strong> ${product.patrimonio}<br>
                 <strong>Setor:</strong> ${product.setor}<br>
                 <strong>Descrição:</strong> ${product.descricao}
-            `;  
-            // Atualiza o campo 'status' com 'ok' no Airtable
+            `;
+
+            // Atualiza o campo 'status' no Airtable
             await updateStatusInAirtable(product.recordId);
-            displaySector(product.setor)
+
+            // Exibe o setor destacado
+            displaySector(product.setor);
         } else {
             resultContainer.classList.remove('result-success');
             resultContainer.classList.add('result-error');
             validationMessage.innerHTML = '❌ Produto não encontrado!';
         }
-    });
+    } catch (error) {
+        console.error("Erro durante o processamento:", error);
+        resultContainer.classList.remove('result-success');
+        resultContainer.classList.add('result-error');
+        validationMessage.innerHTML = '⚠️ Ocorreu um erro ao processar o código!';
+    }
 
+    // Adiciona o código ao histórico
     addToHistory(decodedText);
 }
+
 
 //Atualiza campos Status com ok 
 async function updateStatusInAirtable(recordId) {
