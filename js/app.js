@@ -85,6 +85,12 @@ async function onScanSuccess(decodedText) {
     resultContainer.style.display = 'block';
     resultText.textContent = decodedText;
 
+  // Realiza três vibrações
+    if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]); // Vibrações: [duração, pausa, duração, pausa, duração]
+    }   
+    
+
     // Consulta o produto no Airtable
     const product = await fetchProductFromAirtable(decodedText);
 
