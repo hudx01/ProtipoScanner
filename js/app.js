@@ -16,6 +16,8 @@ function displaySector(sector) {
 
     sectorName.textContent = sector;
     sectorInfo.style.display = 'block';
+    $('#sectorModal').modal('show');
+
 }
 
 
