@@ -75,9 +75,9 @@ async function fetchProductFromAirtable(code) {
     }
 }
 
-async function onScanSuccess(decodedText, decodedResult) {
-    console.log(`Código detectado: ${decodedText}`);
-    
+async function onScanSuccess(decodedText) {
+    console.log(`Código detectado: ${decodedText}`); // Log para depuração
+
     const resultContainer = document.getElementById('result');
     const resultText = document.getElementById('result-text');
     const validationMessage = document.getElementById('validation-message');
@@ -85,42 +85,27 @@ async function onScanSuccess(decodedText, decodedResult) {
     resultContainer.style.display = 'block';
     resultText.textContent = decodedText;
 
-    // Realiza três vibrações
-    if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]); // Vibrações: [duração, pausa, duração]
-    }
+    // Consulta o produto no Airtable
+    const product = await fetchProductFromAirtable(decodedText);
 
-    try {
-        // Busca o produto no Airtable
-        const product = await fetchProductFromAirtable(decodedText);
-
-        if (product) {
-            resultContainer.classList.remove('result-error');
-            resultContainer.classList.add('result-success');
-            validationMessage.innerHTML = `
-                ✅ Produto encontrado!<br>
-                <strong>Patrimônio:</strong> ${product.patrimonio}<br>
-                <strong>Setor:</strong> ${product.setor}<br>
-                <strong>Descrição:</strong> ${product.descricao}
-           `;         
-
-            // Exibe o setor destacado
-            displaySector(product.setor);
-        } else {
-            resultContainer.classList.remove('result-success');
-            resultContainer.classList.add('result-error');
-            validationMessage.innerHTML = '❌ Produto não encontrado!';
-        }
-    } catch (error) {
-        console.error("Erro durante o processamento:", error);
+    if (product) {
+        resultContainer.classList.remove('result-error');
+        resultContainer.classList.add('result-success');
+        validationMessage.innerHTML = `
+            ✅ Produto encontrado!<br>
+            <strong>Patrimônio:</strong> ${product.patrimonio}<br>
+            <strong>Setor:</strong> ${product.setor}<br>
+            <strong>Descrição:</strong> ${product.descricao}
+        `;
+    } else {
         resultContainer.classList.remove('result-success');
         resultContainer.classList.add('result-error');
-        validationMessage.innerHTML = '⚠️ Ocorreu um erro ao processar o código!';
+        validationMessage.innerHTML = '❌ Produto não encontrado!';
     }
 
-    // Adiciona o código ao histórico
     addToHistory(decodedText);
 }
+
 
 
 function onScanError(error) {
